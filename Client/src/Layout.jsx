@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
+import React from "react";
 import { ethers } from "ethers";
 import FileShare from "./artifacts/contracts/FileShare.sol/FileShare.json";
 import Sidebar from './components/Sidebar/Sidebar';
-import { Outlet } from 'react-router-dom';
+import { Outlet} from 'react-router-dom';
+import Header from "./components/header/header";
+import AccountContractContext from "./Context/AccountContractContext";
 
 function Layout() {
   const [address, setAccount]=useState('');
   const [contract, setContract]=useState(null);
   const [provider, setProvider]=useState(null);
+
 
   useEffect(()=> {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -33,9 +37,10 @@ function Layout() {
           signer
         );
         console.log(contract);
+        console.log(address);
         setContract(contract);
         setProvider(signer);
-        
+        console.log(signer);
 
       }
       else{
@@ -43,19 +48,19 @@ function Layout() {
       }
     }
     provider && wallet()
-  },[])
-
+  },[]);
  return (
-    <div className='m-0 p-0'>
-      <div className='flex items-start justify-start'>
-        <Sidebar account={address}
-               provider={provider}
-               contract={contract}></Sidebar>
-        <div className='w-full h-full'>
-          <Outlet />
-        </div>
+  <AccountContractContext.Provider value={{address,contract,provider}}>
+  <div className='m-0 p-0'>
+    <div className='flex items-start justify-start'>
+      <Sidebar account={address} provider={provider} contract={contract} />
+      <div className='w-full h-full'>
+        <Header></Header>
+        <Outlet/>
       </div>
     </div>
+  </div>
+  </AccountContractContext.Provider>
  );
 }
 

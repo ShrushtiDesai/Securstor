@@ -49,7 +49,8 @@ function FileUpload({contract}) {
           console.log(filename);
           console.log(filesize);
           console.log(contract);
-        
+          console.log(file_url);
+
           contract.uploadfile(file_url,filename,filesize);
           console.log("contract executed")
           setCid(resData.IpfsHash);
@@ -72,7 +73,7 @@ function FileUpload({contract}) {
           <li>
                                 <label htmlFor="fileInput"
                                     className=
-                                    "flex justify-left py-2 pr-4 pl-3 duration-200 border-gray-1100 border-2 hover:bg-gray-400 lg:hover:bg-transparent hover:text-white lg:p-0 rounded-[13px] mb-1"
+                                    "flex justify-left py-2 pr-4 pl-3 duration-200 border-gray-1100 border-2 hover:bg-gray-400 hover:text-white  rounded-[13px] mb-1"
                                     
                                   >
                                   <span className='pr-2'><Upload/></span> Upload

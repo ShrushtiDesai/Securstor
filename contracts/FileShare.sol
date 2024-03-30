@@ -20,6 +20,7 @@ contract FileShare {
         require(bytes(_filename).length > 0, "Filename cannot be empty.");
         require(_filesize > 0, "File size must be greater than 0.");
 
+
         fileTokens[_url].primaryOwner = msg.sender;
         fileTokens[_url].filename = _filename;
         fileTokens[_url].filesize = _filesize;
@@ -95,6 +96,21 @@ contract FileShare {
     function hasAccess(string memory _url, address _user) public view returns (bool) {
         FileToken storage token = fileTokens[_url];
         return _user == token.primaryOwner || token.temporaryOwners[_user];
+    }
+
+    function getFileTokenDetails(string memory _url) public view returns (
+        address primaryOwner,
+        string memory filename,
+        uint filesize,
+        uint timestamp
+    ) {
+        FileToken storage token = fileTokens[_url];
+        return (
+            token.primaryOwner,
+            token.filename,
+            token.filesize,
+            token.timestamp
+        );
     }
 
     function displayOwnedFiles() public view returns (string[] memory) {
