@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Upload } from "lucide-react";
-
+import { useToast } from "@/components/ui/use-toast"
 
 function FileUpload({contract}) {
   const VITE_APP_GATEWAY_URL = import.meta.env.VITE_APP_GATEWAY_URL;
   const VITE_APP_PINATA_JWT_ACCESS_TOKEN = import.meta.env.VITE_APP_PINATA_JWT_ACCESS_TOKEN;
-  // const [selectedFile, setSelectedFile] = useState();
+
   const [cid, setCid] = useState();
+  const {toast} = useToast(); 
 
   const changeHandler = async (event) => {
     const file = event.target.files[0];
@@ -51,12 +52,24 @@ function FileUpload({contract}) {
           console.log(contract);
           console.log(file_url);
 
-          contract.uploadfile(file_url,filename,filesize);
+          await contract.uploadfile(file_url,filename,filesize);
+
+          toast({
+            variant: "green",
+            title: "File Uploaded Successfully",
+            description: "Your file has been uploaded and processed.",
+          });
+          
           console.log("contract executed")
           setCid(resData.IpfsHash);
           console.log(resData);
       } catch (error) {
           console.log(error);
+          toast({
+            variant: "destructive",
+            title: "Error Uploading File",
+            description: "There was an error uploading your file. Please try again."
+          });
       }
   };
 

@@ -4,7 +4,7 @@ import { Waypoints } from 'lucide-react';
 function UserItem({account}) {
 
   const userAddress = account;
-  const shortUserAddress = `${userAddress.slice(0,8)}xxxxxx${userAddress.slice(-5)}`;
+  const shortUserAddress = `${userAddress.slice(0,8)}xxx${userAddress.slice(-5)}`;
 
  
 

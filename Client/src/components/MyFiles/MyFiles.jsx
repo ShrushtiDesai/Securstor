@@ -1,6 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { FileInput, Trash2, Share2} from 'lucide-react';
 import AccountContractContext from '@/Context/AccountContractContext';
+import { columns } from './columns';
+import DeleteFile from './DeleteFile';
+
 
 const MyFiles = () => {
  const { address, contract, provider } = useContext(AccountContractContext);
@@ -18,13 +21,16 @@ const MyFiles = () => {
 
         // Iterate over the URLs and fetch file token details for each
         const fileDetails = await Promise.all(fetchedUrls.map(async (url) => {
-          const [primaryOwner, filename, filesize, timestamp] = await contract.getFileTokenDetails(url);
+          const [primaryOwner, filename, filesize, timestamp, fileurl] = await contract.getFileTokenDetails(url);
           // Convert timestamp to a readable date format
-          const date = new Date(timestamp * 1000).toLocaleDateString();
+          const ipfsHash = url.split('/').pop();
+          const date = timestamp;
           return {
             fileName: filename,
-            size: `${filesize}kb`, // Assuming filesize is in kilobytes
+            size: filesize, // Assuming filesize is in kilobytes
             date: date,
+            url: fileurl,
+            ipfsHash: ipfsHash,
           };
         }));
 
@@ -35,36 +41,46 @@ const MyFiles = () => {
     };
 
     fetchFiles();
- }, [fetchedUrlsLength]); // Depend on contract to re-run the effect if it changes
+ }, []); // Depend on contract to re-run the effect if it changes
 
  return (
-    <div className='flex flex-col'>
-      <table>
-        <thead>
-          <tr>
-            <th>File Name</th>
-            <th>Size</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {files.map((file, index) => (
-            <tr key={index}>
-              <td>{file.fileName}</td>
-              <td>{file.size}</td>
-              <td>{file.date}</td>
-              <td>
-                <span className='flex'>
-                 <FileInput />
-                 <Share2 />
-                 <Trash2 />
-                </span>
-              </td>
+<div className='flex flex-col'>
+      <div className="w-full mx-auto p-4 m-4"> {/* Add margin around the container */}
+        <table className="w-full border-collapse"> {/* Apply Tailwind CSS to make the table full width */}
+          <thead>
+            <tr>
+              {columns.map((column, i) => (
+                <th key={i} className="px-4 py-2 border border-solid border-black">
+                 {column.header}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {files.map((file, index) => (
+              <tr key={index}>
+                {columns.map((column, i) => (
+                 <td key={i} className="px-4 py-2 border">
+                    {i < columns.length - 1 ? column.accessor(file) : (
+                      <span className='flex justify-center'>
+                        <button onClick={() => window.open(file.url, '_blank')}>
+                          <FileInput />
+                        </button>
+                        <button>
+                          <Share2 />
+                        </button>
+                        <div>
+                          <DeleteFile IpfsHash={file.ipfsHash} contract={contract} fileurl={file.url}></DeleteFile>
+                        </div>
+                      </span>
+                    )}
+                 </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
  );
 };

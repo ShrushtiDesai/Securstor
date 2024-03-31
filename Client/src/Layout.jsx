@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar/Sidebar';
 import { Outlet} from 'react-router-dom';
 import Header from "./components/header/header";
 import AccountContractContext from "./Context/AccountContractContext";
+import { Toaster } from "./components/ui/toaster";
 
 function Layout() {
   const [address, setAccount]=useState('');
@@ -54,6 +55,7 @@ function Layout() {
     <div className='flex items-start justify-start'>
       <Sidebar account={address} provider={provider} contract={contract} />
       <div className='w-full h-full'>
+        <Toaster/>
         <Outlet/>
       </div>
     </div>

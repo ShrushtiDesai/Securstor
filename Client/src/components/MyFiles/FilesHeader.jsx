@@ -1,8 +1,10 @@
 // Header.jsx
-import React from 'react';
+import React, {useContext} from 'react';
 import MyFiles from './MyFiles';
+import AccountContractContext from '@/Context/AccountContractContext';
 
 const FilesHeader = () => {
+  const { address, contract, provider } = useContext(AccountContractContext);
  return (
   <>
     <header className="bg-black text-white p-4">

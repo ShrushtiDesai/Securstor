@@ -102,14 +102,16 @@ contract FileShare {
         address primaryOwner,
         string memory filename,
         uint filesize,
-        uint timestamp
+        uint timestamp,
+        string memory fileUrl
     ) {
         FileToken storage token = fileTokens[_url];
         return (
             token.primaryOwner,
             token.filename,
             token.filesize,
-            token.timestamp
+            token.timestamp,
+            _url
         );
     }
 
