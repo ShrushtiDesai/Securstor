@@ -12,7 +12,6 @@ function Layout() {
   const [contract, setContract]=useState(null);
   const [provider, setProvider]=useState(null);
 
-
   useEffect(()=> {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const wallet = async()=> {
@@ -55,7 +54,6 @@ function Layout() {
     <div className='flex items-start justify-start'>
       <Sidebar account={address} provider={provider} contract={contract} />
       <div className='w-full h-full'>
-        <Header></Header>
         <Outlet/>
       </div>
     </div>

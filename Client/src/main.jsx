@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import Layout from './Layout.jsx'
-import MyFiles from './components/MyFiles/MyFiles'
-import SharedWithMe from './components/SharedWithMe/SharedWithMe'
-import SharedByMe from './components/SharedByMe/SharedByMe'
+import FilesHeader from './components/MyFiles/FilesHeader'
+import SharedWithMeHeader from './components/SharedWithMe/SharedWithMeHeader'
+import SharedByMeHeader from './components/SharedByMe/SharedByMeHeader'
 
 const router = createBrowserRouter([
   {
@@ -14,15 +14,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',
-        element: <MyFiles/>
+        element: <FilesHeader/>
       },
       {
         path: 'SharedWithMe',
-        element: <SharedWithMe/>
+        element: <SharedWithMeHeader/>
       },
       {
         path: 'SharedByMe',
-        element: <SharedByMe/>
+        element: <SharedByMeHeader/>
       }
     ]
   }
