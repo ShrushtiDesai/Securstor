@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast"
+import useStore from "@/Context/store";
 
 function FileUpload({contract}) {
   const VITE_APP_GATEWAY_URL = import.meta.env.VITE_APP_GATEWAY_URL;
   const VITE_APP_PINATA_JWT_ACCESS_TOKEN = import.meta.env.VITE_APP_PINATA_JWT_ACCESS_TOKEN;
+
+  const {uploadTrigger, setUploadTrigger} = useStore();
 
   const [cid, setCid] = useState();
   const {toast} = useToast(); 
@@ -53,6 +56,8 @@ function FileUpload({contract}) {
           console.log(file_url);
 
           await contract.uploadfile(file_url,filename,filesize);
+          console.log(uploadTrigger);
+          setUploadTrigger(!uploadTrigger);
 
           toast({
             variant: "green",

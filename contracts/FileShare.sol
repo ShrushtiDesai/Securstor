@@ -40,7 +40,7 @@ contract FileShare {
         sharedWith[_url].push(_temporaryOwner); // Track the shared address
     }
 
-    function revokeAccess(string memory _url, address _temporaryOwner) external {
+    function revokeAccesss(string memory _url, address _temporaryOwner) external {
         require(msg.sender == fileTokens[_url].primaryOwner, "Only the primary owner can revoke access.");
         require(fileTokens[_url].primaryOwner != address(0), "File does not exist.");
         if (!fileTokens[_url].temporaryOwners[_temporaryOwner]) {

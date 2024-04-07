@@ -1,27 +1,32 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FileInput, Trash2, Share2} from 'lucide-react';
+import { FileInput} from 'lucide-react';
 import AccountContractContext from '@/Context/AccountContractContext';
 import { columns } from './columns';
 import DeleteFile from './DeleteFile';
-
+import GrantAcess from '../Accesscontrol/GrantAcess';
+import useStore from '@/Context/store';
 
 const MyFiles = () => {
  const { address, contract, provider } = useContext(AccountContractContext);
  const [files, setFiles] = useState([]); // State to store the files
- const [fetchedUrlsLength, setFetchedUrlsLength] = useState(0);
 
+ const {uploadTrigger} = useStore();
 
  useEffect(() => {
+
     const fetchFiles = async () => {
       try {
+        await new Promise(resolve => setTimeout(resolve, 20000));
+
         const fetchedUrls = await contract.displayOwnedFiles();
-        setFetchedUrlsLength(fetchedUrls.length);
         console.log(fetchedUrls);
-        console.log(fetchedUrlsLength);
+        console.log(typeof(fetchedUrls));
 
         // Iterate over the URLs and fetch file token details for each
         const fileDetails = await Promise.all(fetchedUrls.map(async (url) => {
+          console.log("myfiles map check")
           const [primaryOwner, filename, filesize, timestamp, fileurl] = await contract.getFileTokenDetails(url);
+          console.log("inside files use effect")
           // Convert timestamp to a readable date format
           const ipfsHash = url.split('/').pop();
           const date = timestamp;
@@ -39,9 +44,10 @@ const MyFiles = () => {
         console.error("Error fetching file details:", error);
       }
     };
-
+   
     fetchFiles();
- }, []); // Depend on contract to re-run the effect if it changes
+    console.log("line 43 of myfiles upload trigger:",uploadTrigger);
+ }, [contract, uploadTrigger]); // Depend on contract to re-run the effect if it changes
 
  return (
 <div className='flex flex-col'>
@@ -66,9 +72,9 @@ const MyFiles = () => {
                         <button onClick={() => window.open(file.url, '_blank')}>
                           <FileInput />
                         </button>
-                        <button>
-                          <Share2 />
-                        </button>
+                        <div>
+                          <GrantAcess/>
+                        </div>
                         <div>
                           <DeleteFile IpfsHash={file.ipfsHash} contract={contract} fileurl={file.url}></DeleteFile>
                         </div>

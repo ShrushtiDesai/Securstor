@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 function DeleteFile({IpfsHash, contract, fileurl}) {
   const VITE_APP_PINATA_JWT_ACCESS_TOKEN = import.meta.env.VITE_APP_PINATA_JWT_ACCESS_TOKEN;
 
-  console.log(VITE_APP_PINATA_JWT_ACCESS_TOKEN);
+  console.log("delete file me");
 
   const deletePin = async (IpfsHash) => {
     try {
