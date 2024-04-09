@@ -2,11 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { FileInput } from 'lucide-react';
 import AccountContractContext from '@/Context/AccountContractContext';
 import { columns } from './columnsForShared';
+import { Button } from '../ui/button';
+import useStore from '@/Context/store';
 
 
 const SharedWithMe = () => {
  const { contract } = useContext(AccountContractContext);
  const [sharedFiles, setsharedwithFiles] = useState([]); // State to store the files
+ const { grantTrigger, revokeTrigger } = useStore();
 
  useEffect(() => {
     const fetchshareFiles = async () => {
@@ -38,7 +41,14 @@ const SharedWithMe = () => {
     };
 
     fetchshareFiles();
- }, [contract]); // Depend on contract to re-run the effect if it changes
+
+    const timer = setTimeout(() => {
+      fetchshareFiles();
+    }, 20000);
+
+    return() => clearTimeout(timer);
+
+ }, [contract,grantTrigger,revokeTrigger]); // grant aur revoke bhi add karna hai
 
  return (
     <div className='flex flex-col'>
@@ -60,9 +70,9 @@ const SharedWithMe = () => {
                  <td key={i} className="px-4 py-2 border">
                     {i < columns.length - 1 ? column.accessor(file) : (
                       <span className='flex justify-center'>
-                        <button onClick={() => window.open(file.url, '_blank')}>
+                        <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
                           <FileInput />
-                        </button>
+                        </Button>
                       </span>
                     )}
                  </td>

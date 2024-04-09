@@ -38,6 +38,13 @@ const SharedByMe = () => {
     };
 
     grantFiles();
+
+    const timer = setTimeout(() => {
+      grantFiles();
+    }, 20000);
+
+    return() => clearTimeout(timer);
+
  }, [contract, revokeTrigger]);
 
  useEffect(() => {

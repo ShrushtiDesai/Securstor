@@ -38,6 +38,7 @@ const GrantAcess = ({ FileUrl }) => {
   const { contract } = useContext(AccountContractContext);
   const { userAddress, setUserAddress } = useStore();
   const { setFileurl } = useStore();
+  const { grantTrigger, setgrantTrigger } = useStore();
   const { toast } = useToast();
 
   const form = useForm({
@@ -61,6 +62,8 @@ const GrantAcess = ({ FileUrl }) => {
       try {
         await contract.grantAccess(FileUrl, values.address);
 
+        setgrantTrigger(!grantTrigger);
+
         toast({
           variant: "green",
           title: "Granting Access",
@@ -71,7 +74,7 @@ const GrantAcess = ({ FileUrl }) => {
         toast({
           variant: "Destructive",
           title: "Error",
-          description: "Failed to grant access. Please try again.",
+          description: "Failed to grant access. Check whether access is already granted or try again.",
         });
       }
     })();

@@ -34,15 +34,15 @@ function RevokeAccess({fileUrl, TempOwnerAddress}) {
 
         toast({
           variant: "green",
-          title: "Granting Access",
-          description: `Granting Access : ${values.address}`,
+          title: "Access Revoked",
+          description: `Access Revoked : ${TempOwnerAddress}`,
         });
       } catch (error) {
-        console.error("Error granting access:", error);
+        console.error("Error revoking access:", error);
         toast({
           variant: "Destructive",
           title: "Error",
-          description: "Failed to grant access. Please try again.",
+          description: "Failed to revoke access. Check if access is already revoked or try again later.",
         });
       }
     })();

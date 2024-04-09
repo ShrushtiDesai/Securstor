@@ -36,7 +36,7 @@ module.exports = {
           foreground: "hsl(var(--destructive-foreground))",
         },
         success: {
-          DEFAULT: "#86DC3D",
+          DEFAULT: "#2ECC71",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {

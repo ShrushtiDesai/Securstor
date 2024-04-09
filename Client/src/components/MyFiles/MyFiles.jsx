@@ -5,9 +5,9 @@ import { columns } from './columns';
 import DeleteFile from './DeleteFile';
 import GrantAcess from '../Accesscontrol/GrantAcess';
 import useStore from '@/Context/store';
-
+import { Button } from '../ui/button';
 const MyFiles = () => {
-  const { address, contract, provider } = useContext(AccountContractContext);
+  const { contract } = useContext(AccountContractContext);
   const [files, setFiles] = useState([]); // State to store the files
 
   const { uploadTrigger } = useStore();
@@ -16,7 +16,6 @@ const MyFiles = () => {
 
     const fetchFiles = async () => {
       try {
-        await new Promise(resolve => setTimeout(resolve, 20000));
 
         const fetchedUrls = await contract.displayOwnedFiles();
         console.log(fetchedUrls);
@@ -46,7 +45,15 @@ const MyFiles = () => {
     };
 
     fetchFiles();
-    console.log("line 43 of myfiles upload trigger:", uploadTrigger);
+    
+    const timer = setTimeout(() => {
+      fetchFiles();
+    }, 20000);
+
+    console.log("line 53 of myfiles upload trigger:", uploadTrigger);
+
+    return() => clearTimeout(timer);
+
   }, [contract, uploadTrigger]); // Depend on contract to re-run the effect if it changes
 
   return (
@@ -69,9 +76,9 @@ const MyFiles = () => {
                   <td key={i} className="px-4 py-2 border">
                     {i < columns.length - 1 ? column.accessor(file) : (
                       <span className='flex justify-center'>
-                        <button onClick={() => window.open(file.url, '_blank')}>
+                        <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
                           <FileInput />
-                        </button>
+                        </Button>
                         <div>
                           <GrantAcess FileUrl={file.url}></GrantAcess>
                         </div>

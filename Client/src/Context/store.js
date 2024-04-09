@@ -10,6 +10,8 @@ const useStore = create(set => ({
   setFileurl: (value) => set({ fileurl: value }),
   revokeTrigger: false,
   setrevokeTrigger: (value) => set({ revokeTrigger: value }),
+  grantTrigger: false,
+  setgrantTrigger: (value) => set({ grantTrigger: value }),
 
 }));
 
