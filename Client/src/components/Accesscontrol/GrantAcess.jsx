@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import {Share2} from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import useStore from '@/Context/store';
+import { useToast } from "@/components/ui/use-toast"
+import AccountContractContext from '@/Context/AccountContractContext';
 
 const formSchema = z.object({
   address: z.string().length(42, {
@@ -32,8 +34,11 @@ const formSchema = z.object({
   }),
 });
 
-const GrantAcess = () => {
-  const {setUserAddress} = useStore();
+const GrantAcess = ({ FileUrl }) => {
+  const { contract } = useContext(AccountContractContext);
+  const { userAddress, setUserAddress } = useStore();
+  const { setFileurl } = useStore();
+  const { toast } = useToast();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -42,20 +47,42 @@ const GrantAcess = () => {
     }
   })
 
+  const fileurlAccess = () => {
+    setFileurl(FileUrl);
+    console.log(`Granting access to file: ${FileUrl}`);
+  }
 
   function onSubmit(values) {
 
     console.log(values.address)
     setUserAddress(values.address);
-    // console.log("user address stored", userAddress)
+
+    (async () => {
+      try {
+        await contract.grantAccess(FileUrl, userAddress);
+
+        toast({
+          variant: "green",
+          title: "Granting Access",
+          description: `Granting Access : ${values.address}`,
+        });
+      } catch (error) {
+        console.error("Error granting access:", error);
+        toast({
+          variant: "Destructive",
+          title: "Error",
+          description: "Failed to grant access. Please try again.",
+        });
+      }
+    })();
 
   }
 
- return (
+  return (
     <div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant='ghost' className="bg-blue-400 hover:bg-blue-200 mx-2"><Share2/></Button>
+          <Button variant='ghost' className="bg-blue-400 hover:bg-blue-200 mx-2" onClick={fileurlAccess}><Share2 /></Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -65,30 +92,30 @@ const GrantAcess = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Input placeholder="Wallet Address" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction><Button type="submit">Submit</Button></AlertDialogAction>
-            </AlertDialogFooter>
-      </form>
-    </Form>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Wallet Address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction type="submit">Submit</AlertDialogAction>
+              </AlertDialogFooter>
+            </form>
+          </Form>
         </AlertDialogContent>
       </AlertDialog>
     </div>
- );
+  );
 };
 
 export default GrantAcess;

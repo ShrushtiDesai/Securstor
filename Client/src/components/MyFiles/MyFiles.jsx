@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FileInput} from 'lucide-react';
+import { FileInput } from 'lucide-react';
 import AccountContractContext from '@/Context/AccountContractContext';
 import { columns } from './columns';
 import DeleteFile from './DeleteFile';
@@ -7,12 +7,12 @@ import GrantAcess from '../Accesscontrol/GrantAcess';
 import useStore from '@/Context/store';
 
 const MyFiles = () => {
- const { address, contract, provider } = useContext(AccountContractContext);
- const [files, setFiles] = useState([]); // State to store the files
+  const { address, contract, provider } = useContext(AccountContractContext);
+  const [files, setFiles] = useState([]); // State to store the files
 
- const {uploadTrigger} = useStore();
+  const { uploadTrigger } = useStore();
 
- useEffect(() => {
+  useEffect(() => {
 
     const fetchFiles = async () => {
       try {
@@ -20,7 +20,7 @@ const MyFiles = () => {
 
         const fetchedUrls = await contract.displayOwnedFiles();
         console.log(fetchedUrls);
-        console.log(typeof(fetchedUrls));
+        console.log(typeof (fetchedUrls));
 
         // Iterate over the URLs and fetch file token details for each
         const fileDetails = await Promise.all(fetchedUrls.map(async (url) => {
@@ -44,20 +44,20 @@ const MyFiles = () => {
         console.error("Error fetching file details:", error);
       }
     };
-   
-    fetchFiles();
-    console.log("line 43 of myfiles upload trigger:",uploadTrigger);
- }, [contract, uploadTrigger]); // Depend on contract to re-run the effect if it changes
 
- return (
-<div className='flex flex-col'>
+    fetchFiles();
+    console.log("line 43 of myfiles upload trigger:", uploadTrigger);
+  }, [contract, uploadTrigger]); // Depend on contract to re-run the effect if it changes
+
+  return (
+    <div className='flex flex-col'>
       <div className="w-full mx-auto p-4 m-4"> {/* Add margin around the container */}
         <table className="w-full border-collapse"> {/* Apply Tailwind CSS to make the table full width */}
           <thead>
             <tr>
               {columns.map((column, i) => (
                 <th key={i} className="px-4 py-2 border border-solid border-black">
-                 {column.header}
+                  {column.header}
                 </th>
               ))}
             </tr>
@@ -66,21 +66,21 @@ const MyFiles = () => {
             {files.map((file, index) => (
               <tr key={index}>
                 {columns.map((column, i) => (
-                 <td key={i} className="px-4 py-2 border">
+                  <td key={i} className="px-4 py-2 border">
                     {i < columns.length - 1 ? column.accessor(file) : (
                       <span className='flex justify-center'>
                         <button onClick={() => window.open(file.url, '_blank')}>
                           <FileInput />
                         </button>
                         <div>
-                          <GrantAcess/>
+                          <GrantAcess FileUrl={file.url}></GrantAcess>
                         </div>
                         <div>
                           <DeleteFile IpfsHash={file.ipfsHash} contract={contract} fileurl={file.url}></DeleteFile>
                         </div>
                       </span>
                     )}
-                 </td>
+                  </td>
                 ))}
               </tr>
             ))}
@@ -88,7 +88,7 @@ const MyFiles = () => {
         </table>
       </div>
     </div>
- );
+  );
 };
 
 export default MyFiles;
