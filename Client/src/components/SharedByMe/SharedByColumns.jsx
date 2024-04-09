@@ -1,4 +1,5 @@
 // columns.js
+import { formatFileSize } from "@/lib/utils";
 
 export const columns = [
    {
@@ -7,7 +8,7 @@ export const columns = [
    },
    {
       header: 'Size',
-      accessor: (file) => `${file.size}kb`,
+      accessor: (file) => formatFileSize(file.size),
    },
    {
       header: 'Date',
