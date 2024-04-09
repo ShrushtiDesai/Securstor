@@ -59,7 +59,7 @@ const GrantAcess = ({ FileUrl }) => {
 
     (async () => {
       try {
-        await contract.grantAccess(FileUrl, userAddress);
+        await contract.grantAccess(FileUrl, values.address);
 
         toast({
           variant: "green",

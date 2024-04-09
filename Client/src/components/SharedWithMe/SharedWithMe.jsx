@@ -1,21 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FileInput, Trash2, Share2 } from 'lucide-react';
+import { FileInput } from 'lucide-react';
 import AccountContractContext from '@/Context/AccountContractContext';
 import { columns } from './columnsForShared';
 
 
 const SharedWithMe = () => {
- const { address, contract, provider } = useContext(AccountContractContext);
- const [files, setFiles] = useState([]); // State to store the files
+ const { contract } = useContext(AccountContractContext);
+ const [sharedFiles, setsharedwithFiles] = useState([]); // State to store the files
 
  useEffect(() => {
     const fetchshareFiles = async () => {
       try {
         // Fetch files shared with the current user
-        const fetchedUrls = await contract.displayFilesSharedWithMe();
-        console.log(fetchedUrls);
+        const sharedwithfiles = await contract.displayFilesSharedWithMe();
+        console.log(sharedwithfiles);
         // Iterate over the URLs and fetch file token details for each
-        const fileDetails = await Promise.all(fetchedUrls.map(async (url) => {
+        const sharedwithfileDetails = await Promise.all(sharedwithfiles.map(async (url) => {
           const [primaryOwner, filename, filesize, timestamp, fileurl] = await contract.getFileTokenDetails(url);
           // Convert timestamp to a readable date format
           const ipfsHash = url.split('/').pop();
@@ -30,14 +30,15 @@ const SharedWithMe = () => {
           };
         }));
 
-        setFiles(fileDetails); // Update the state with the fetched file details
+        setsharedwithFiles(sharedwithfileDetails); 
+
       } catch (error) {
         console.error("Error fetching file details:", error);
       }
     };
 
     fetchshareFiles();
- }, []); // Depend on contract to re-run the effect if it changes
+ }, [contract]); // Depend on contract to re-run the effect if it changes
 
  return (
     <div className='flex flex-col'>
@@ -53,7 +54,7 @@ const SharedWithMe = () => {
             </tr>
           </thead>
           <tbody>
-            {files.map((file, index) => (
+            {sharedFiles.map((file, index) => (
               <tr key={index}>
                 {columns.map((column, i) => (
                  <td key={i} className="px-4 py-2 border">

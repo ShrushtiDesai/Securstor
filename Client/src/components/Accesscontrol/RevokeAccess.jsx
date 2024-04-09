@@ -14,9 +14,11 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/ui/use-toast"
 import AccountContractContext from '@/Context/AccountContractContext'
+import useStore from '@/Context/store'
 
 function RevokeAccess({fileUrl, TempOwnerAddress}) {
   const { contract } = useContext(AccountContractContext);
+  const {revokeTrigger, setrevokeTrigger} = useStore();
   console.log("revoke me contract hai:",contract);
   console.log("fileurl to revoke:",fileUrl);
   console.log("temp address to revoke:", TempOwnerAddress);
@@ -28,6 +30,7 @@ function RevokeAccess({fileUrl, TempOwnerAddress}) {
     (async () => {
       try {
         await contract.revokeAccess(fileUrl, TempOwnerAddress);
+        setrevokeTrigger(!revokeTrigger);
 
         toast({
           variant: "green",

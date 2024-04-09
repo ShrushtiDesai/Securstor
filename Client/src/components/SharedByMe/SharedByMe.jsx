@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import AccountContractContext from '@/Context/AccountContractContext';
-import { columns } from './SharedByColumns'; // Import the columns
+import { columns } from './SharedByColumns'; 
 import RevokeAccess from '../Accesscontrol/RevokeAccess';
+import useStore from '@/Context/store';
 
 const SharedByMe = () => {
  const { address, contract } = useContext(AccountContractContext);
  const [sharedFiles, setSharedFiles] = useState([]);
  const [selectedTempOwners, setSelectedTempOwners] = useState({});
+ const {revokeTrigger} = useStore();
 
  useEffect(() => {
     const grantFiles = async () => {
@@ -36,7 +38,17 @@ const SharedByMe = () => {
     };
 
     grantFiles();
- }, [contract]);
+ }, [contract, revokeTrigger]);
+
+ useEffect(() => {
+  const initialSelectedTempOwners = {};
+  sharedFiles.forEach(file => {
+    if (file.tempOwners.length > 0) {
+      initialSelectedTempOwners[file.url] = file.tempOwners[0];
+    }
+  });
+  setSelectedTempOwners(initialSelectedTempOwners);
+}, [sharedFiles]);
 
  return (
     <div className='flex flex-col'>
