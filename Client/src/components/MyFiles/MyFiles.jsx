@@ -6,6 +6,14 @@ import DeleteFile from './DeleteFile';
 import GrantAcess from '../Accesscontrol/GrantAcess';
 import useStore from '@/Context/store';
 import { Button } from '../ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+
 const MyFiles = () => {
   const { contract } = useContext(AccountContractContext);
   const [files, setFiles] = useState([]); // State to store the files
@@ -76,9 +84,19 @@ const MyFiles = () => {
                   <td key={i} className="px-4 py-2 border">
                     {i < columns.length - 1 ? column.accessor(file) : (
                       <span className='flex justify-center'>
-                        <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                            <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
                           <FileInput />
                         </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className='bg-black text-white'>
+                              <p>Open</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        
                         <div>
                           <GrantAcess FileUrl={file.url}></GrantAcess>
                         </div>

@@ -27,6 +27,13 @@ import { Input } from "@/components/ui/input"
 import useStore from '@/Context/store';
 import { useToast } from "@/components/ui/use-toast"
 import AccountContractContext from '@/Context/AccountContractContext';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 
 const formSchema = z.object({
   address: z.string().length(42, {
@@ -85,7 +92,16 @@ const GrantAcess = ({ FileUrl }) => {
     <div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant='ghost' className="bg-blue-400 hover:bg-blue-200 mx-2" onClick={fileurlAccess}><Share2 /></Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+              <Button variant='ghost' className="bg-blue-400 hover:bg-blue-200 mx-2" onClick={fileurlAccess}><Share2 /></Button>
+              </TooltipTrigger>
+              <TooltipContent className='bg-black text-white'>
+                <p>Share</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>

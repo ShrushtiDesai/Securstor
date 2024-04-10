@@ -15,6 +15,13 @@ import {
 import { useToast } from "@/components/ui/use-toast"
 import AccountContractContext from '@/Context/AccountContractContext'
 import useStore from '@/Context/store'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 
 function RevokeAccess({fileUrl, TempOwnerAddress}) {
   const { contract } = useContext(AccountContractContext);
@@ -52,7 +59,17 @@ function RevokeAccess({fileUrl, TempOwnerAddress}) {
     <div>
       <AlertDialog>
   <AlertDialogTrigger asChild>
-  <Button variant='destructive'><FileX2/></Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+        <Button variant='destructive'><FileX2/></Button>
+        </TooltipTrigger>
+        <TooltipContent className='bg-black text-white'>
+          <p>Revoke</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  
   </AlertDialogTrigger>
   <AlertDialogContent>
     <AlertDialogHeader>

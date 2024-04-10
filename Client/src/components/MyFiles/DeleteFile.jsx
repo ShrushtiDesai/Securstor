@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 
 function DeleteFile({IpfsHash, contract, fileurl}) {
   const VITE_APP_PINATA_JWT_ACCESS_TOKEN = import.meta.env.VITE_APP_PINATA_JWT_ACCESS_TOKEN;
@@ -50,7 +57,17 @@ function DeleteFile({IpfsHash, contract, fileurl}) {
   return (
       <>
       <div>
-        <Button variant='ghost' onClick={() => deletePin(IpfsHash)} className='bg-red-500 hover:bg-red-400'><Trash2/></Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+            <Button variant='ghost' onClick={() => deletePin(IpfsHash)} className='bg-red-500 hover:bg-red-400'><Trash2/></Button>
+            </TooltipTrigger>
+            <TooltipContent className='bg-black text-white'>
+              <p>Delete</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
       </div>
           
       </>
