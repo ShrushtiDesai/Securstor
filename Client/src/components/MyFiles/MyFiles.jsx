@@ -12,6 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+ // Import the placeholder image
+import placeholderImage from '@/assets/empty.svg';
 
 
 const MyFiles = () => {
@@ -72,48 +74,58 @@ const MyFiles = () => {
             <tr>
               {columns.map((column, i) => (
                 <th key={i} className="px-4 py-2 border border-solid border-black">
-                  {column.header}
+                 {column.header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {files.map((file, index) => (
-              <tr key={index}>
-                {columns.map((column, i) => (
-                  <td key={i} className="px-4 py-2 border">
-                    {i < columns.length - 1 ? column.accessor(file) : (
-                      <span className='flex justify-center'>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                            <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
-                          <FileInput />
-                        </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className='bg-black text-white'>
-                              <p>Open</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        
-                        <div>
-                          <GrantAcess FileUrl={file.url}></GrantAcess>
-                        </div>
-                        <div>
-                          <DeleteFile IpfsHash={file.ipfsHash} contract={contract} fileurl={file.url}></DeleteFile>
-                        </div>
-                      </span>
-                    )}
-                  </td>
-                ))}
+            {files.length > 0 ? (
+              files.map((file, index) => (
+                <tr key={index}>
+                 {columns.map((column, i) => (
+                    <td key={i} className="px-4 py-2 border">
+                      {i < columns.length - 1 ? column.accessor(file) : (
+                        <span className='flex justify-center'>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
+                                 <FileInput />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className='bg-black text-white'>
+                                <p>Open</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <div>
+                            <GrantAcess FileUrl={file.url}></GrantAcess>
+                          </div>
+                          <div>
+                            <DeleteFile IpfsHash={file.ipfsHash} contract={contract} fileurl={file.url}></DeleteFile>
+                          </div>
+                        </span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length} className="w-full h-full flex-col px-4 py-2 border text-center">
+                  <div className='flex flex-col gap-4 justify-center items-center w-full h-full'>
+                  <img src={placeholderImage} width={400} height={400} alt="No files found" className="mx-auto" />
+                 <p className='text-2xl'>No files to display.</p>
+                  </div>
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
     </div>
-  );
+ );
 };
 
 export default MyFiles;
