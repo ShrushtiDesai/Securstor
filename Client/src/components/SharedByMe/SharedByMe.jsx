@@ -16,18 +16,17 @@ const SharedByMe = () => {
       try {
         const fetchGrantFiles = await contract.getSharedOwnedFiles();
 
-        const sharedFilesDetails = await Promise.all(fetchGrantFiles.map(async (url) => {
-          const [primaryOwner, filename, filesize, timestamp, fileurl] = await contract.getFileTokenDetails(url);
-          const ipfsHash = url.split('/').pop();
+        const sharedFilesDetails = await Promise.all(fetchGrantFiles.map(async (hash) => {
+          const [primaryOwner, filename, filesize, timestamp, filehash] = await contract.getFileTokenDetails(hash);
+          const ipfsHash = filehash;
           const date = timestamp;
-          const tempOwners = await contract.getTemporaryOwners(fileurl);
+          const tempOwners = await contract.getTemporaryOwners(filehash);
 
           return {
             fileName: filename,
             size: filesize,
             date: date,
-            url: fileurl,
-            ipfsHash: ipfsHash,
+            hash: ipfsHash,
             tempOwners: tempOwners,
           };
         }));
@@ -52,7 +51,7 @@ const SharedByMe = () => {
   const initialSelectedTempOwners = {};
   sharedFiles.forEach(file => {
     if (file.tempOwners.length > 0) {
-      initialSelectedTempOwners[file.url] = file.tempOwners[0];
+      initialSelectedTempOwners[file.hash] = file.tempOwners[0];
     }
   });
   setSelectedTempOwners(initialSelectedTempOwners);
@@ -85,7 +84,7 @@ const SharedByMe = () => {
              <td className="px-4 py-2 border">
              <select
                  onChange={(e) => {
-                   const newSelectedTempOwners = { ...selectedTempOwners, [file.url]: e.target.value };
+                   const newSelectedTempOwners = { ...selectedTempOwners, [file.hash]: e.target.value };
                    setSelectedTempOwners(newSelectedTempOwners);
                  }}
              >
@@ -95,7 +94,7 @@ const SharedByMe = () => {
              </select>
              </td>
              <td className="px-4 py-2 border">
-             <RevokeAccess fileUrl={file.url} TempOwnerAddress={selectedTempOwners[file.url]} />
+             <RevokeAccess fileUrl={file.hash} TempOwnerAddress={selectedTempOwners[file.hash]} />
              </td>
             </tr>
           ))

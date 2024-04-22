@@ -12,6 +12,8 @@ const useStore = create(set => ({
   setrevokeTrigger: (value) => set({ revokeTrigger: value }),
   grantTrigger: false,
   setgrantTrigger: (value) => set({ grantTrigger: value }),
+  deleteTrigger: false,
+  setdeleteTrigger: (value) => set({ deleteTrigger: value }),
 
 }));
 

@@ -1,32 +1,70 @@
-import React, { useState } from "react";
 import { Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast"
 import useStore from "@/Context/store";
+import { LitNodeClient, encryptFileAndZipWithMetadata, checkAndSignAuthMessage } from "@lit-protocol/lit-node-client";
+import { useState } from "react";
 
-function FileUpload({ contract }) {
+function FileUpload({ address, contract }) {
     const VITE_APP_GATEWAY_URL = import.meta.env.VITE_APP_GATEWAY_URL;
     const VITE_APP_PINATA_JWT_ACCESS_TOKEN = import.meta.env.VITE_APP_PINATA_JWT_ACCESS_TOKEN;
 
-    const { uploadTrigger, setUploadTrigger } = useStore();
+    const [files, setfiles] = useState([]);
 
-    const [cid, setCid] = useState();
+    const { uploadTrigger, setUploadTrigger } = useStore();
     const { toast } = useToast();
 
     const changeHandler = async (event) => {
         const file = event.target.files[0];
         if (file) {
             await handleSubmission(file); // Pass the file directly to handleSubmission
+            event.target.value = '';
         }
     };
 
     const handleSubmission = async (file) => {
         try {
+            // Create our litNodeClient
+            const litNodeClient = new LitNodeClient({
+                litNetwork: 'cayenne',
+            });
+            // Then get the authSig
+            await litNodeClient.connect();
+            const authSig = await checkAndSignAuthMessage({
+                chain: 'ethereum'
+            });
+
+            const accs = [
+                {
+                    contractAddress: '',
+                    standardContractType: '',
+                    chain: 'ethereum',
+                    method: 'eth_getBalance',
+                    parameters: [':userAddress', 'latest'],
+                    returnValueTest: {
+                        comparator: '>=',
+                        value: '0',
+                    },
+                },
+            ];
+
+            const encryptedZip = await encryptFileAndZipWithMetadata({
+                accessControlConditions: accs,
+                authSig,
+                chain: 'ethereum',
+                file: file,
+                litNodeClient: litNodeClient,
+                readme: "Use IPFS CID of this file to decrypt it"
+            });
+
+            const encryptedBlob = new Blob([encryptedZip], { type: 'text/plain' })
+            const encryptedFile = new File([encryptedBlob], file.name)
+
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", encryptedFile);
             const metadata = JSON.stringify({
-                name: file.name, // Include the file name
-                size: file.size, // Include the file size
-                type: file.type, // Include the file type
+                name: encryptedFile.name, // Include the file name
+                size: encryptedFile.size, // Include the file size
+                type: encryptedFile.type, // Include the file type
             });
             formData.append("pinataMetadata", metadata);
 
@@ -46,27 +84,26 @@ function FileUpload({ contract }) {
                 }
             );
             const resData = await res.json();
-            const file_url = `${VITE_APP_GATEWAY_URL}/ipfs/${resData.IpfsHash}`;
+            const CID = `${resData.IpfsHash}`;
             console.log("line before contract");
-            const filename = file.name;
-            const filesize = file.size;
+            const filename = encryptedFile.name;
+            const filesize = encryptedFile.size;
             console.log(filename);
             console.log(filesize);
             console.log(contract);
-            console.log(file_url);
+            console.log(CID);
 
-            await contract.uploadfile(file_url, filename, filesize);
+            await contract.uploadfile(CID, filename, filesize);
             console.log(uploadTrigger);
             setUploadTrigger(!uploadTrigger);
 
             toast({
                 variant: "green",
                 title: "File Uploaded Successfully",
-                description: "Your file has been uploaded and processed.",
+                description: "Your file has been uploaded.",
             });
 
             console.log("contract executed")
-            setCid(resData.IpfsHash);
             console.log(resData);
         } catch (error) {
             console.log(error);

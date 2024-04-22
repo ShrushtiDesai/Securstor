@@ -4,7 +4,6 @@ import { ethers } from "ethers";
 import FileShare from "./artifacts/contracts/FileShare.sol/FileShare.json";
 import Sidebar from './components/Sidebar/Sidebar';
 import { Outlet} from 'react-router-dom';
-import Header from "./components/header/header";
 import AccountContractContext from "./Context/AccountContractContext";
 import { Toaster } from "./components/ui/toaster";
 

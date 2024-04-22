@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import FileAccess from '../Accesscontrol/FileAccess';
 
 
 
@@ -26,17 +27,16 @@ const SharedWithMe = () => {
         const sharedwithfiles = await contract.displayFilesSharedWithMe();
         console.log(sharedwithfiles);
         // Iterate over the URLs and fetch file token details for each
-        const sharedwithfileDetails = await Promise.all(sharedwithfiles.map(async (url) => {
-          const [primaryOwner, filename, filesize, timestamp, fileurl] = await contract.getFileTokenDetails(url);
+        const sharedwithfileDetails = await Promise.all(sharedwithfiles.map(async (hash) => {
+          const [primaryOwner, filename, filesize, timestamp, filehash] = await contract.getFileTokenDetails(hash);
           // Convert timestamp to a readable date format
-          const ipfsHash = url.split('/').pop();
+          const ipfsHash = filehash;
           const date = timestamp;
           return {
             fileName: filename,
             size: filesize, // Assuming filesize is in kilobytes
             date: date,
-            url: fileurl,
-            ipfsHash: ipfsHash,
+            hash: ipfsHash,
             primaryOwner: primaryOwner, // Include primary owner's address
           };
         }));
@@ -79,18 +79,7 @@ const SharedWithMe = () => {
                 <td key={i} className="px-4 py-2 border">
                   {i < columns.length - 1 ? column.accessor(file) : (
                     <span className='flex justify-center'>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
-                             <FileInput />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className='bg-black text-white'>
-                            <p>Open</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <FileAccess filehash={file.hash}></FileAccess>
                     </span>
                   )}
                 </td>

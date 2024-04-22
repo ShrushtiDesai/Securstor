@@ -4,13 +4,13 @@ import { Files, Forward, Share2, Upload } from 'lucide-react'
 import FileUpload from '../MyFiles/FileUpload'
 
 
-function Menubar({contract}) {
+function Menubar({address,contract}) {
   // console.log(contract);
   return (
     <div className='flex flex-col pt-2'>
       <ul className="flex flex-col space-y-1">
       <div>
-        <FileUpload contract={contract}></FileUpload>
+        <FileUpload contract={contract} address={address}></FileUpload>
       </div>
       <li>
                                 <NavLink

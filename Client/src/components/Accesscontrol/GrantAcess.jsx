@@ -91,7 +91,7 @@ const GrantAcess = ({ FileUrl }) => {
   return (
     <div>
       <AlertDialog>
-        <AlertDialogTrigger asChild>
+        <AlertDialogTrigger>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>

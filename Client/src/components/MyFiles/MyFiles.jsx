@@ -1,50 +1,42 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FileInput } from 'lucide-react';
 import AccountContractContext from '@/Context/AccountContractContext';
 import { columns } from './columns';
 import DeleteFile from './DeleteFile';
 import GrantAcess from '../Accesscontrol/GrantAcess';
 import useStore from '@/Context/store';
-import { Button } from '../ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
- // Import the placeholder image
 import placeholderImage from '@/assets/empty.svg';
+import FileAccess from '../Accesscontrol/FileAccess';
 
 
 const MyFiles = () => {
-  const { contract } = useContext(AccountContractContext);
+  const { contract, address } = useContext(AccountContractContext);
   const [files, setFiles] = useState([]); // State to store the files
 
   const { uploadTrigger } = useStore();
+  const {deleteTrigger} = useStore();
 
   useEffect(() => {
 
     const fetchFiles = async () => {
       try {
 
-        const fetchedUrls = await contract.displayOwnedFiles();
-        console.log(fetchedUrls);
-        console.log(typeof (fetchedUrls));
+        const fetchedhash = await contract.displayOwnedFiles();
+        console.log(fetchedhash);
+        console.log(typeof (fetchedhash));
 
         // Iterate over the URLs and fetch file token details for each
-        const fileDetails = await Promise.all(fetchedUrls.map(async (url) => {
+        const fileDetails = await Promise.all(fetchedhash.map(async (hash) => {
           console.log("myfiles map check")
-          const [primaryOwner, filename, filesize, timestamp, fileurl] = await contract.getFileTokenDetails(url);
+          const [primaryOwner, filename, filesize, timestamp, filehash] = await contract.getFileTokenDetails(hash);
           console.log("inside files use effect")
           // Convert timestamp to a readable date format
-          const ipfsHash = url.split('/').pop();
+          const ipfsHash = filehash;
           const date = timestamp;
           return {
             fileName: filename,
             size: filesize, // Assuming filesize is in kilobytes
             date: date,
-            url: fileurl,
-            ipfsHash: ipfsHash,
+            hash: ipfsHash
           };
         }));
 
@@ -64,7 +56,7 @@ const MyFiles = () => {
 
     return() => clearTimeout(timer);
 
-  }, [contract, uploadTrigger]); // Depend on contract to re-run the effect if it changes
+  }, [contract, uploadTrigger, deleteTrigger]); // Depend on contract to re-run the effect if it changes
 
   return (
     <div className='flex flex-col'>
@@ -87,23 +79,12 @@ const MyFiles = () => {
                     <td key={i} className="px-4 py-2 border">
                       {i < columns.length - 1 ? column.accessor(file) : (
                         <span className='flex justify-center'>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Button variant='ghost' className='bg-green-400 hover:bg-green-300' onClick={() => window.open(file.url, '_blank')}>
-                                 <FileInput />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent className='bg-black text-white'>
-                                <p>Open</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <FileAccess filehash={file.hash}></FileAccess>
                           <div>
-                            <GrantAcess FileUrl={file.url}></GrantAcess>
+                            <GrantAcess FileUrl={file.hash}></GrantAcess>
                           </div>
                           <div>
-                            <DeleteFile IpfsHash={file.ipfsHash} contract={contract} fileurl={file.url}></DeleteFile>
+                            <DeleteFile IpfsHash={file.hash} contract={contract}></DeleteFile>
                           </div>
                         </span>
                       )}

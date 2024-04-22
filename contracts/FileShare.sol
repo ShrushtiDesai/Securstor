@@ -17,77 +17,77 @@ contract FileShare {
     mapping(string => address[]) sharedWith; // Mapping to track shared addresses for each file
 
     function uploadfile(
-        string memory _url,
+        string memory _hash,
         string memory _filename,
         uint _filesize
     ) external {
-        require(bytes(_url).length > 0, "File URL cannot be empty.");
+        require(bytes(_hash).length > 0, "File hash cannot be empty.");
         require(bytes(_filename).length > 0, "Filename cannot be empty.");
         require(_filesize > 0, "File size must be greater than 0.");
 
-        fileTokens[_url].primaryOwner = msg.sender;
-        fileTokens[_url].filename = _filename;
-        fileTokens[_url].filesize = _filesize;
-        fileTokens[_url].timestamp = block.timestamp;
+        fileTokens[_hash].primaryOwner = msg.sender;
+        fileTokens[_hash].filename = _filename;
+        fileTokens[_hash].filesize = _filesize;
+        fileTokens[_hash].timestamp = block.timestamp;
 
-        ownerFiles[msg.sender].push(_url);
+        ownerFiles[msg.sender].push(_hash);
     }
 
-    function grantAccess(string memory _url, address _temporaryOwner) external {
+    function grantAccess(string memory _hash, address _temporaryOwner) external {
         require(
-            msg.sender == fileTokens[_url].primaryOwner,
+            msg.sender == fileTokens[_hash].primaryOwner,
             "Only the primary owner can grant access."
         );
         require(
-            fileTokens[_url].primaryOwner != address(0),
+            fileTokens[_hash].primaryOwner != address(0),
             "File does not exist."
         );
-        if (fileTokens[_url].temporaryOwners[_temporaryOwner]) {
+        if (fileTokens[_hash].temporaryOwners[_temporaryOwner]) {
             revert("Access has already been granted.");
         }
-        fileTokens[_url].temporaryOwners[_temporaryOwner] = true;
-        fileTokens[_url].temporaryOwnerAddresses.push(_temporaryOwner); // Add the address to the array
-        sharedFiles[_temporaryOwner].push(_url);
-        sharedWith[_url].push(_temporaryOwner); // Track the shared address
+        fileTokens[_hash].temporaryOwners[_temporaryOwner] = true;
+        fileTokens[_hash].temporaryOwnerAddresses.push(_temporaryOwner); // Add the address to the array
+        sharedFiles[_temporaryOwner].push(_hash);
+        sharedWith[_hash].push(_temporaryOwner); // Track the shared address
     }
 
     function revokeAccess(
-        string memory _url,
+        string memory _hash,
         address _temporaryOwner
     ) external {
         require(
-            msg.sender == fileTokens[_url].primaryOwner,
+            msg.sender == fileTokens[_hash].primaryOwner,
             "Only the primary owner can revoke access."
         );
         require(
-            fileTokens[_url].primaryOwner != address(0),
+            fileTokens[_hash].primaryOwner != address(0),
             "File does not exist."
         );
-        if (!fileTokens[_url].temporaryOwners[_temporaryOwner]) {
+        if (!fileTokens[_hash].temporaryOwners[_temporaryOwner]) {
             revert("Access has not been granted.");
         }
-        fileTokens[_url].temporaryOwners[_temporaryOwner] = false;
+        fileTokens[_hash].temporaryOwners[_temporaryOwner] = false;
         // Remove the address from the temporaryOwnerAddresses array
         for (
             uint i = 0;
-            i < fileTokens[_url].temporaryOwnerAddresses.length;
+            i < fileTokens[_hash].temporaryOwnerAddresses.length;
             i++
         ) {
             if (
-                fileTokens[_url].temporaryOwnerAddresses[i] == _temporaryOwner
+                fileTokens[_hash].temporaryOwnerAddresses[i] == _temporaryOwner
             ) {
-                fileTokens[_url].temporaryOwnerAddresses[i] = fileTokens[_url]
+                fileTokens[_hash].temporaryOwnerAddresses[i] = fileTokens[_hash]
                     .temporaryOwnerAddresses[
-                        fileTokens[_url].temporaryOwnerAddresses.length - 1
+                        fileTokens[_hash].temporaryOwnerAddresses.length - 1
                     ];
-                fileTokens[_url].temporaryOwnerAddresses.pop();
+                fileTokens[_hash].temporaryOwnerAddresses.pop();
                 break;
             }
         }
         for (uint i = 0; i < sharedFiles[_temporaryOwner].length; i++) {
             if (
                 keccak256(abi.encodePacked(sharedFiles[_temporaryOwner][i])) ==
-                keccak256(abi.encodePacked(_url))
+                keccak256(abi.encodePacked(_hash))
             ) {
                 sharedFiles[_temporaryOwner][i] = sharedFiles[_temporaryOwner][
                     sharedFiles[_temporaryOwner].length - 1
@@ -96,31 +96,31 @@ contract FileShare {
                 break;
             }
         }
-        for (uint i = 0; i < sharedWith[_url].length; i++) {
-            if (sharedWith[_url][i] == _temporaryOwner) {
-                sharedWith[_url][i] = sharedWith[_url][
-                    sharedWith[_url].length - 1
+        for (uint i = 0; i < sharedWith[_hash].length; i++) {
+            if (sharedWith[_hash][i] == _temporaryOwner) {
+                sharedWith[_hash][i] = sharedWith[_hash][
+                    sharedWith[_hash].length - 1
                 ];
-                sharedWith[_url].pop();
+                sharedWith[_hash].pop();
                 break;
             }
         }
     }
 
-    function deleteFile(string memory _url) external {
+    function deleteFile(string memory _hash) external {
         require(
-            msg.sender == fileTokens[_url].primaryOwner,
+            msg.sender == fileTokens[_hash].primaryOwner,
             "Only the primary owner can delete the file."
         );
         require(
-            fileTokens[_url].primaryOwner != address(0),
+            fileTokens[_hash].primaryOwner != address(0),
             "File does not exist."
         );
 
         for (uint i = 0; i < ownerFiles[msg.sender].length; i++) {
             if (
                 keccak256(abi.encodePacked(ownerFiles[msg.sender][i])) ==
-                keccak256(abi.encodePacked(_url))
+                keccak256(abi.encodePacked(_hash))
             ) {
                 ownerFiles[msg.sender][i] = ownerFiles[msg.sender][
                     ownerFiles[msg.sender].length - 1
@@ -130,12 +130,12 @@ contract FileShare {
             }
         }
 
-        for (uint i = 0; i < sharedWith[_url].length; i++) {
-            address tempOwner = sharedWith[_url][i];
+        for (uint i = 0; i < sharedWith[_hash].length; i++) {
+            address tempOwner = sharedWith[_hash][i];
             for (uint j = 0; j < sharedFiles[tempOwner].length; j++) {
                 if (
                     keccak256(abi.encodePacked(sharedFiles[tempOwner][j])) ==
-                    keccak256(abi.encodePacked(_url))
+                    keccak256(abi.encodePacked(_hash))
                 ) {
                     sharedFiles[tempOwner][j] = sharedFiles[tempOwner][
                         sharedFiles[tempOwner].length - 1
@@ -146,20 +146,20 @@ contract FileShare {
             }
         }
 
-        delete fileTokens[_url];
-        delete sharedWith[_url];
+        delete fileTokens[_hash];
+        delete sharedWith[_hash];
     }
 
     function hasAccess(
-        string memory _url,
+        string memory _hash,
         address _user
     ) public view returns (bool) {
-        FileToken storage token = fileTokens[_url];
+        FileToken storage token = fileTokens[_hash];
         return _user == token.primaryOwner || token.temporaryOwners[_user];
     }
 
     function getFileTokenDetails(
-        string memory _url
+        string memory _hash
     )
         public
         view
@@ -168,16 +168,16 @@ contract FileShare {
             string memory filename,
             uint filesize,
             uint timestamp,
-            string memory fileUrl
+            string memory filehash
         )
     {
-        FileToken storage token = fileTokens[_url];
+        FileToken storage token = fileTokens[_hash];
         return (
             token.primaryOwner,
             token.filename,
             token.filesize,
             token.timestamp,
-            _url
+            _hash
         );
     }
 
@@ -191,9 +191,9 @@ contract FileShare {
 
     // Function to get the addresses with temporary access for a given file URL
     function getTemporaryOwners(
-        string memory _url
+        string memory _hash
     ) public view returns (address[] memory) {
-        FileToken storage token = fileTokens[_url];
+        FileToken storage token = fileTokens[_hash];
         return token.temporaryOwnerAddresses;
     }
 
@@ -203,13 +203,13 @@ contract FileShare {
         uint sharedCount = 0;
 
         for (uint i = 0; i < ownedFiles.length; i++) {
-            string memory fileUrl = ownedFiles[i];
-            address[] memory sharedWithAddresses = sharedWith[fileUrl];
+            string memory filehash = ownedFiles[i];
+            address[] memory sharedWithAddresses = sharedWith[filehash];
 
             // Check if the file is shared with others (excluding the primary owner)
             for (uint j = 0; j < sharedWithAddresses.length; j++) {
                 if (sharedWithAddresses[j] != msg.sender) {
-                    sharedFilesArray[sharedCount] = fileUrl; // Add the file URL to the array
+                    sharedFilesArray[sharedCount] = filehash; // Add the file URL to the array
                     sharedCount++;
                     break; // No need to check further for this file
                 }

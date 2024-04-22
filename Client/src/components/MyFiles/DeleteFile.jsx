@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useToast } from "@/components/ui/use-toast"
@@ -8,11 +7,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import useStore from "@/Context/store";
 
 
-function DeleteFile({IpfsHash, contract, fileurl}) {
+function DeleteFile({IpfsHash, contract}) {
   const VITE_APP_PINATA_JWT_ACCESS_TOKEN = import.meta.env.VITE_APP_PINATA_JWT_ACCESS_TOKEN;
   const { toast } = useToast();
+  const {deleteTrigger, setdeleteTrigger} = useStore();
 
   console.log("delete file me");
 
@@ -28,8 +29,10 @@ function DeleteFile({IpfsHash, contract, fileurl}) {
    
        if (response.ok) {
          console.log("Pin deleted successfully");
-         await contract.deleteFile(fileurl);
+         await contract.deleteFile(IpfsHash);
          console.log("file deleted.")
+         setdeleteTrigger(!deleteTrigger);
+         
          toast({
           variant: "green",
           title: "File Deleted",

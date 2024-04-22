@@ -58,7 +58,7 @@ function RevokeAccess({fileUrl, TempOwnerAddress}) {
   return (
     <div>
       <AlertDialog>
-  <AlertDialogTrigger asChild>
+  <AlertDialogTrigger>
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
